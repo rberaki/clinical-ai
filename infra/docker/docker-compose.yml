@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: clinical_postgres
+    environment:
+      POSTGRES_USER: clinical
+      POSTGRES_PASSWORD: clinical
+      POSTGRES_DB: clinical
+    ports:
+      - "5432:5432"
+    volumes:
+      - clinical_pgdata:/var/lib/postgresql/data
+
+volumes:
+  clinical_pgdata:

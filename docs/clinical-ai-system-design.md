@@ -1,6 +1,4 @@
-# Clinical AI Platform – System Design v0.1
-
-## 1. Problem Definition
+# 1. Problem Definition
 
 ### Objective
 
