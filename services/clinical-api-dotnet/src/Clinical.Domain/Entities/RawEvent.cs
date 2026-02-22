@@ -11,7 +11,7 @@ public sealed class RawEvent
     public Guid? PatientId { get; set; }
     public Guid? EncounterId { get; set; }
 
-    public string Source { get; set; } = "unknown";
+    public string SourceSystem { get; set; } = "unknown";
     public string EventType { get; set; } = default!;
 
     // Stored as jsonb in Postgres via EF config

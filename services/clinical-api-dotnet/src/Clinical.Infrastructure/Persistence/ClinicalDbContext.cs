@@ -23,13 +23,12 @@ public sealed class ClinicalDbContext(DbContextOptions<ClinicalDbContext> option
             entity.Property(x => x.IdempotencyKey).HasMaxLength(200);
             entity.Property(x => x.PatientId);
             entity.Property(x => x.EncounterId);
-            entity.Property(x => x.Source).HasMaxLength(100).IsRequired();
+            entity.Property(x => x.SourceSystem).HasMaxLength(100).IsRequired();
             entity.Property(x => x.EventType).HasMaxLength(200).IsRequired();
             entity.Property(x => x.PayloadJson).HasColumnType("jsonb").IsRequired();
 
             entity.Property(x => x.OccurredAtUtc)
                 .HasColumnType("timestamptz")
-                .HasDefaultValueSql("now()")
                 .IsRequired();
 
             entity.Property(x => x.IngestedAtUtc)
@@ -54,7 +53,6 @@ public sealed class ClinicalDbContext(DbContextOptions<ClinicalDbContext> option
 
             entity.Property(x => x.LastProcessedAtUtc)
                 .HasColumnType("timestamptz")
-                .HasDefaultValueSql("now()")
                 .IsRequired();
 
             entity.Property(x => x.UpdatedAtUtc)

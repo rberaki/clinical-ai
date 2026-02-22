@@ -34,7 +34,7 @@ public sealed class IngestRawEventCommandHandler(ClinicalDbContext dbContext)
             IdempotencyKey = hasIdempotencyKey ? request.IdempotencyKey : null,
             PatientId = request.PatientId,
             EncounterId = request.EncounterId,
-            Source = request.SourceSystem,
+            SourceSystem = request.SourceSystem,
             EventType = request.EventType,
             PayloadJson = request.PayloadJson,
             OccurredAtUtc = request.OccurredAtUtc,

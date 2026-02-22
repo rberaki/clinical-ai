@@ -1,4 +1,4 @@
-using Clinical.Application.Events;
+using Clinical.Application;
 using Clinical.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -9,9 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddMediatR(
-    typeof(IngestRawEventCommand).Assembly,
-    typeof(ClinicalDbContext).Assembly);
+builder.Services.AddMediatR(typeof(AssemblyMarker).Assembly);
 
 builder.Services.AddDbContext<ClinicalDbContext>(options =>
 {
