@@ -8,6 +8,8 @@ public sealed class ClinicalDbContext(DbContextOptions<ClinicalDbContext> option
     public DbSet<RawEvent> RawEvents => Set<RawEvent>();
     public DbSet<PipelineWatermark> PipelineWatermarks => Set<PipelineWatermark>();
     public DbSet<FeatureRun> FeatureRuns => Set<FeatureRun>();
+    public DbSet<PredictionRun> PredictionRuns => Set<PredictionRun>();
+    public DbSet<Alert> Alerts => Set<Alert>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -96,6 +98,60 @@ public sealed class ClinicalDbContext(DbContextOptions<ClinicalDbContext> option
             entity.Property(x => x.ProcessedEvents).IsRequired();
 
             entity.HasIndex(x => new { x.PipelineName, x.EncounterId, x.WindowEndUtc });
+        });
+
+        modelBuilder.Entity<PredictionRun>(entity =>
+        {
+            entity.ToTable("prediction_runs");
+
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Id).ValueGeneratedNever();
+
+            entity.Property(x => x.FeatureRunId).IsRequired();
+            entity.Property(x => x.ModelVersion).HasMaxLength(100).IsRequired();
+            entity.Property(x => x.HorizonHours).IsRequired();
+            entity.Property(x => x.RiskScore).IsRequired();
+            entity.Property(x => x.SurvivalSummaryJson).HasColumnType("jsonb");
+            entity.Property(x => x.CreatedAtUtc)
+                .HasColumnType("timestamptz")
+                .HasDefaultValueSql("now()")
+                .IsRequired();
+
+            entity.HasIndex(x => new { x.FeatureRunId, x.CreatedAtUtc })
+                .IsDescending(false, true);
+
+            entity.HasOne(x => x.FeatureRun)
+                .WithMany()
+                .HasForeignKey(x => x.FeatureRunId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Alert>(entity =>
+        {
+            entity.ToTable("alerts");
+
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Id).ValueGeneratedNever();
+
+            entity.Property(x => x.EncounterId).IsRequired();
+            entity.Property(x => x.PredictionRunId).IsRequired();
+            entity.Property(x => x.Threshold).IsRequired();
+            entity.Property(x => x.RiskScore).IsRequired();
+            entity.Property(x => x.Status).HasMaxLength(30).IsRequired();
+            entity.Property(x => x.CreatedAtUtc)
+                .HasColumnType("timestamptz")
+                .HasDefaultValueSql("now()")
+                .IsRequired();
+            entity.Property(x => x.AcknowledgedAtUtc).HasColumnType("timestamptz");
+            entity.Property(x => x.ClosedAtUtc).HasColumnType("timestamptz");
+
+            entity.HasIndex(x => new { x.EncounterId, x.Status, x.CreatedAtUtc })
+                .IsDescending(false, false, true);
+
+            entity.HasOne(x => x.PredictionRun)
+                .WithMany()
+                .HasForeignKey(x => x.PredictionRunId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

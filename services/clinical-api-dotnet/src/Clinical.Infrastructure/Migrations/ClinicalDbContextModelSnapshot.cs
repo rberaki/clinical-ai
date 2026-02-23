@@ -22,6 +22,49 @@ namespace Clinical.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Clinical.Domain.Entities.Alert", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("AcknowledgedAtUtc")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<DateTimeOffset?>("ClosedAtUtc")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamptz")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid>("EncounterId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PredictionRunId")
+                        .HasColumnType("uuid");
+
+                    b.Property<double>("RiskScore")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<double>("Threshold")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PredictionRunId");
+
+                    b.HasIndex("EncounterId", "Status", "CreatedAtUtc")
+                        .IsDescending(false, false, true);
+
+                    b.ToTable("alerts", (string)null);
+                });
+
             modelBuilder.Entity("Clinical.Domain.Entities.FeatureRun", b =>
                 {
                     b.Property<Guid>("Id")
@@ -107,6 +150,41 @@ namespace Clinical.Infrastructure.Migrations
                     b.ToTable("pipeline_watermarks", (string)null);
                 });
 
+            modelBuilder.Entity("Clinical.Domain.Entities.PredictionRun", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamptz")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid>("FeatureRunId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("HorizonHours")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ModelVersion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<double>("RiskScore")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("SurvivalSummaryJson")
+                        .HasColumnType("jsonb");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FeatureRunId", "CreatedAtUtc")
+                        .IsDescending(false, true);
+
+                    b.ToTable("prediction_runs", (string)null);
+                });
+
             modelBuilder.Entity("Clinical.Domain.Entities.RawEvent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -155,6 +233,28 @@ namespace Clinical.Infrastructure.Migrations
                     b.HasIndex("PatientId", "OccurredAtUtc");
 
                     b.ToTable("raw_events", (string)null);
+                });
+
+            modelBuilder.Entity("Clinical.Domain.Entities.Alert", b =>
+                {
+                    b.HasOne("Clinical.Domain.Entities.PredictionRun", "PredictionRun")
+                        .WithMany()
+                        .HasForeignKey("PredictionRunId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PredictionRun");
+                });
+
+            modelBuilder.Entity("Clinical.Domain.Entities.PredictionRun", b =>
+                {
+                    b.HasOne("Clinical.Domain.Entities.FeatureRun", "FeatureRun")
+                        .WithMany()
+                        .HasForeignKey("FeatureRunId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FeatureRun");
                 });
 #pragma warning restore 612, 618
         }
