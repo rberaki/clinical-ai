@@ -21,13 +21,13 @@ docker compose -f infra/docker/docker-compose.yml up -d
 dotnet tool restore
 
 dotnet dotnet-ef database update \
-  --project services/clinical-api-dotnet/src/Clinical.Infrastructure/Clinical.Infrastructure.csproj \
-  --startup-project services/clinical-api-dotnet/src/Clinical.Api/Clinical.Api.csproj
+  --project services/clinical-api/src/Clinical.Infrastructure/Clinical.Infrastructure.csproj \
+  --startup-project services/clinical-api/src/Clinical.Api/Clinical.Api.csproj
 ```
 
 ## Run API
 ```bash
-dotnet run --project services/clinical-api-dotnet/src/Clinical.Api/Clinical.Api.csproj
+dotnet run --project services/clinical-api/src/Clinical.Api/Clinical.Api.csproj
 ```
 
 ## API Endpoints

@@ -10,6 +10,13 @@
 /.config/*
 !/.config/dotnet-tools.json
 
+# Local-only large/regulated datasets
+/data/mimic/**
+!/data/mimic/.gitkeep
+
+# Temporary: ignore EF Core migrations in clinical-api
+/services/clinical-api/src/Clinical.Infrastructure/Migrations/**
+
 # User-specific files
 *.rsuser
 *.suo

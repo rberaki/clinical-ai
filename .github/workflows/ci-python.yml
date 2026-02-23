@@ -1,0 +1,23 @@
+name: ci-python
+
+on:
+  push:
+    paths:
+      - 'services/ml-service/**'
+      - 'services/feature-pipeline/**'
+      - '.github/workflows/ci-python.yml'
+  pull_request:
+    paths:
+      - 'services/ml-service/**'
+      - 'services/feature-pipeline/**'
+      - '.github/workflows/ci-python.yml'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python --version

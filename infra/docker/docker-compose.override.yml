@@ -1,0 +1,6 @@
+services:
+  postgres:
+    environment:
+      POSTGRES_USER: clinical
+      POSTGRES_PASSWORD: clinical
+      POSTGRES_DB: clinical
