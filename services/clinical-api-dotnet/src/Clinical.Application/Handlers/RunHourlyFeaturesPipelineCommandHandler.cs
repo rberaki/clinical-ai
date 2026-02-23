@@ -20,7 +20,7 @@ public sealed class RunHourlyFeaturesPipelineCommandHandler(ClinicalDbContext db
         RunHourlyFeaturesPipelineCommand request,
         CancellationToken cancellationToken)
     {
-        var nowUtc = DateTimeOffset.UtcNow;
+        var startedAt = DateTimeOffset.UtcNow;
         await using var tx = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         var watermark = await _dbContext.PipelineWatermarks
@@ -31,7 +31,7 @@ public sealed class RunHourlyFeaturesPipelineCommandHandler(ClinicalDbContext db
         // Pull NEW events since watermark, based on OccurredAtUtc (source time), not IngestedAtUtc.
         var newEvents = await _dbContext.RawEvents
             .AsNoTracking()
-            .Where(x => x.EncounterId != null && x.OccurredAtUtc > lastProcessed && x.OccurredAtUtc <= nowUtc)
+            .Where(x => x.EncounterId != null && x.OccurredAtUtc > lastProcessed)
             .OrderBy(x => x.OccurredAtUtc)
             .ThenBy(x => x.Id)
             .ToListAsync(cancellationToken);
@@ -50,6 +50,7 @@ public sealed class RunHourlyFeaturesPipelineCommandHandler(ClinicalDbContext db
         }
 
         var groups = newEvents.GroupBy(e => e.EncounterId!.Value).ToList();
+        var completedAt = DateTimeOffset.UtcNow;
 
         var runIds = new List<Guid>(groups.Count);
 
@@ -74,8 +75,8 @@ public sealed class RunHourlyFeaturesPipelineCommandHandler(ClinicalDbContext db
                 FeatureVersion = "v0",
                 InputEventIds = inputIds,
                 FeatureHash = featureHash,
-                StartedAtUtc = nowUtc,
-                CompletedAtUtc = nowUtc,
+                StartedAtUtc = startedAt,
+                CompletedAtUtc = completedAt,
                 Status = "Completed",
                 ProcessedEvents = ordered.Count
             };
@@ -92,13 +93,13 @@ public sealed class RunHourlyFeaturesPipelineCommandHandler(ClinicalDbContext db
             {
                 PipelineName = PipelineName,
                 LastProcessedAtUtc = newWatermarkUtc,
-                UpdatedAtUtc = nowUtc
+                UpdatedAtUtc = completedAt
             });
         }
         else
         {
             watermark.LastProcessedAtUtc = newWatermarkUtc;
-            watermark.UpdatedAtUtc = nowUtc;
+            watermark.UpdatedAtUtc = completedAt;
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);

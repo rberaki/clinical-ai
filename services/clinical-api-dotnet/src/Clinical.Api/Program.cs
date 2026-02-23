@@ -13,7 +13,9 @@ builder.Services.AddMediatR(typeof(AssemblyMarker).Assembly);
 
 builder.Services.AddDbContext<ClinicalDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("ClinicalDb")
+    var connectionString =
+        builder.Configuration.GetConnectionString("ClinicalDb")
+        ?? builder.Configuration["ConnectionStrings:ClinicalDb"]
         ?? throw new InvalidOperationException("Connection string 'ClinicalDb' is missing.");
 
     options.UseNpgsql(connectionString);
@@ -28,6 +30,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();

@@ -37,6 +37,7 @@ public sealed class ClinicalDbContext(DbContextOptions<ClinicalDbContext> option
                 .IsRequired();
 
             entity.HasIndex(x => new { x.EncounterId, x.OccurredAtUtc });
+            entity.HasIndex(x => new { x.PatientId, x.OccurredAtUtc });
 
             entity.HasIndex(x => x.IdempotencyKey)
                 .IsUnique()
