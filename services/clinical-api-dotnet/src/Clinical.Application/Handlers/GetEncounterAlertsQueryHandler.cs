@@ -1,4 +1,5 @@
 using Clinical.Application.Alerts;
+using Clinical.Domain;
 using Clinical.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,7 @@ public sealed class GetEncounterAlertsQueryHandler(ClinicalDbContext dbContext)
         GetEncounterAlertsQuery request,
         CancellationToken cancellationToken)
     {
-        var status = string.IsNullOrWhiteSpace(request.Status) ? "Active" : request.Status;
+        var status = string.IsNullOrWhiteSpace(request.Status) ? AlertStatus.Active : request.Status;
 
         return await _dbContext.Alerts
             .AsNoTracking()

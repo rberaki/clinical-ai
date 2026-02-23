@@ -7,10 +7,10 @@ public sealed class Alert
     public Guid PredictionRunId { get; set; }
     public double Threshold { get; set; }
     public double RiskScore { get; set; }
-    public string Status { get; set; } = string.Empty;
+    public string Status { get; set; } = default!;
     public DateTimeOffset CreatedAtUtc { get; set; }
     public DateTimeOffset? AcknowledgedAtUtc { get; set; }
     public DateTimeOffset? ClosedAtUtc { get; set; }
 
-    public PredictionRun? PredictionRun { get; set; }
+    public PredictionRun PredictionRun { get; set; } = default!;
 }

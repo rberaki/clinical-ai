@@ -1,4 +1,5 @@
 using Clinical.Application.Alerts;
+using Clinical.Domain;
 using Clinical.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -18,9 +19,14 @@ public sealed class AcknowledgeAlertCommandHandler(ClinicalDbContext dbContext)
             .FirstOrDefaultAsync(x => x.Id == request.AlertId, cancellationToken)
             ?? throw new KeyNotFoundException($"Alert '{request.AlertId}' was not found.");
 
-        if (!string.Equals(alert.Status, "Acknowledged", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(alert.Status, AlertStatus.Closed, StringComparison.Ordinal))
         {
-            alert.Status = "Acknowledged";
+            throw new InvalidOperationException("Closed alerts cannot be acknowledged.");
+        }
+
+        if (!string.Equals(alert.Status, AlertStatus.Acknowledged, StringComparison.Ordinal))
+        {
+            alert.Status = AlertStatus.Acknowledged;
             alert.AcknowledgedAtUtc = DateTimeOffset.UtcNow;
             await _dbContext.SaveChangesAsync(cancellationToken);
         }

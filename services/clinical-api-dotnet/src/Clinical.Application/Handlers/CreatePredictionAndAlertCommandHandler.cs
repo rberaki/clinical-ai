@@ -1,5 +1,6 @@
 using Clinical.Application.Models;
 using Clinical.Application.Predictions;
+using Clinical.Domain;
 using Clinical.Domain.Entities;
 using Clinical.Infrastructure.Persistence;
 using MediatR;
@@ -25,8 +26,6 @@ public sealed class CreatePredictionAndAlertCommandHandler(
 
         var prediction = await _riskModel.PredictAsync(featureRun, request.HorizonHours, cancellationToken);
 
-        var createdAt = DateTimeOffset.UtcNow;
-
         var predictionRun = new PredictionRun
         {
             Id = Guid.NewGuid(),
@@ -34,8 +33,7 @@ public sealed class CreatePredictionAndAlertCommandHandler(
             ModelVersion = prediction.ModelVersion,
             HorizonHours = request.HorizonHours,
             RiskScore = prediction.RiskScore,
-            SurvivalSummaryJson = prediction.SurvivalSummaryJson,
-            CreatedAtUtc = createdAt
+            SurvivalSummaryJson = prediction.SurvivalSummaryJson
         };
 
         _dbContext.PredictionRuns.Add(predictionRun);
@@ -51,8 +49,7 @@ public sealed class CreatePredictionAndAlertCommandHandler(
                 PredictionRunId = predictionRun.Id,
                 Threshold = request.Threshold,
                 RiskScore = prediction.RiskScore,
-                Status = "Active",
-                CreatedAtUtc = createdAt
+                Status = AlertStatus.Active
             };
 
             _dbContext.Alerts.Add(alert);

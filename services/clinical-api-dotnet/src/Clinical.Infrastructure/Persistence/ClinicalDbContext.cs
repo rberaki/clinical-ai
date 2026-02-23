@@ -117,8 +117,7 @@ public sealed class ClinicalDbContext(DbContextOptions<ClinicalDbContext> option
                 .HasDefaultValueSql("now()")
                 .IsRequired();
 
-            entity.HasIndex(x => new { x.FeatureRunId, x.CreatedAtUtc })
-                .IsDescending(false, true);
+            entity.HasIndex(x => new { x.FeatureRunId, x.CreatedAtUtc });
 
             entity.HasOne(x => x.FeatureRun)
                 .WithMany()
@@ -145,8 +144,7 @@ public sealed class ClinicalDbContext(DbContextOptions<ClinicalDbContext> option
             entity.Property(x => x.AcknowledgedAtUtc).HasColumnType("timestamptz");
             entity.Property(x => x.ClosedAtUtc).HasColumnType("timestamptz");
 
-            entity.HasIndex(x => new { x.EncounterId, x.Status, x.CreatedAtUtc })
-                .IsDescending(false, false, true);
+            entity.HasIndex(x => new { x.EncounterId, x.Status, x.CreatedAtUtc });
 
             entity.HasOne(x => x.PredictionRun)
                 .WithMany()

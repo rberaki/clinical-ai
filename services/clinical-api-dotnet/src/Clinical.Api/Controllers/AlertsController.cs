@@ -15,8 +15,15 @@ public sealed class AlertsController(IMediator mediator) : ControllerBase
         Guid alertId,
         CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(new AcknowledgeAlertCommand(alertId), cancellationToken);
-        return Ok(result);
+        try
+        {
+            var result = await _mediator.Send(new AcknowledgeAlertCommand(alertId), cancellationToken);
+            return Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
     }
 
     [HttpGet("encounters/{encounterId:guid}/alerts")]
