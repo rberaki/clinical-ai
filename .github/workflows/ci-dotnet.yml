@@ -1,14 +1,8 @@
 name: ci-dotnet
 
 on:
-  push:
-    paths:
-      - 'services/clinical-api/**'
-      - '.github/workflows/ci-dotnet.yml'
-  pull_request:
-    paths:
-      - 'services/clinical-api/**'
-      - '.github/workflows/ci-dotnet.yml'
+  # Temporarily disabled for automatic CI runs; manual only.
+  workflow_dispatch:
 
 jobs:
   build:

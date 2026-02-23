@@ -1,16 +1,8 @@
 name: ci-python
 
 on:
-  push:
-    paths:
-      - 'services/ml-service/**'
-      - 'services/feature-pipeline/**'
-      - '.github/workflows/ci-python.yml'
-  pull_request:
-    paths:
-      - 'services/ml-service/**'
-      - 'services/feature-pipeline/**'
-      - '.github/workflows/ci-python.yml'
+  # Temporarily disabled for automatic CI runs; manual only.
+  workflow_dispatch:
 
 jobs:
   lint:

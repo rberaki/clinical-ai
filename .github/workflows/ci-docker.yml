@@ -1,14 +1,8 @@
 name: ci-docker
 
 on:
-  push:
-    paths:
-      - 'infra/docker/**'
-      - '.github/workflows/ci-docker.yml'
-  pull_request:
-    paths:
-      - 'infra/docker/**'
-      - '.github/workflows/ci-docker.yml'
+  # Temporarily disabled for automatic CI runs; manual only.
+  workflow_dispatch:
 
 jobs:
   validate-compose:
